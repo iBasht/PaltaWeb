@@ -245,15 +245,44 @@ with pestana_monitoreo:
     # PANEL DERECHO: Resumen Ejecutivo (Métricas Globales)
     # -----------------------------------------------------------------
     with col_derecha:
-        st.subheader("📈 Resumen Ejecutivo")
+        st.subheader("📈 Resultados de Enfermedades")
         
-        # Verificamos si ya se corrió el modelo para mostrar datos reales, si no, mostramos ceros
-        total_p = st.session_state.get('total_paltas', 0)
-        conteo_p = st.session_state.get('conteo_actual', {'Healthy': 0, 'Anthracnose': 0, 'Scab': 0})
+        # Recuperamos la lista de resultados detallados desde el estado de la sesión.
+        # (Asegúrate de guardar los resultados de tu modelo en esta variable)
+        resultados_detalle = st.session_state.get('resultados_detalle', [])
         
-        st.metric(label="Total Procesadas", value=f"{total_p} und")
-        st.metric(label="Fruta Comercial (Sana)", value=f"{conteo_p['Healthy']} und", delta="Apto para exportación")
-        st.metric(label="Fruta Descarte (Infectada)", value=f"{conteo_p['Anthracnose'] + conteo_p['Scab']} und", delta="- Crítico", delta_color="inverse")
+        if not resultados_detalle:
+            st.info("Esperando captura y análisis de la cámara...")
+        else:
+            import pandas as pd
+            df = pd.DataFrame(resultados_detalle)
+            
+            # Configuramos la tabla para mostrar la barra de porcentaje visualmente
+            st.dataframe(
+                df,
+                column_config={
+                    "Fruto": "ID Fruto",
+                    "Diagnóstico": st.column_config.TextColumn("Condición"),
+                    "Porcentaje": st.column_config.ProgressColumn(
+                        "Confianza del Modelo",
+                        help="Nivel de certeza de la red neuronal",
+                        format="%.2f %%",
+                        min_value=0,
+                        max_value=100,
+                    ),
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+            
+            # Resumen del lote basado en tu consola de Colab
+            st.divider()
+            total_p = len(resultados_detalle)
+            sanas = sum(1 for r in resultados_detalle if r['Diagnóstico'] == 'Healthy')
+            enfermas = total_p - sanas
+            
+            st.write(f"**Total analizados:** {total_p} und")
+            st.caption(f"🟢 Sanas: {sanas} | 🔴 Con afección: {enfermas}")
         
         st.divider()
         st.button("📄 Generar Reporte PDF")
