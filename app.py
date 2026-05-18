@@ -198,4 +198,5 @@ with pestana_monitoreo:
         st.markdown("### 🟡 TABLA: ROÑA")
         df_rona = pd.DataFrame({"ID": ["P_07", "P_09"], "Daño Área": ["32%", "11%"], "Severidad": [2, 1]})
         st.dataframe(df_rona, hide_index=True)
-        st.download_button("Descargar CSV", data=df_rona.to_csv(index=False), file_name="rona
+        # ESTA ES LA LÍNEA 201 QUE SE HABÍA CORTADO:
+        st.download_button("Descargar CSV", data=df_rona.to_csv(index=False), file_name="rona.csv", mime="text/csv")
