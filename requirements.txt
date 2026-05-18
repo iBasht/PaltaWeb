@@ -5,3 +5,6 @@ opencv-python-headless
 ultralytics
 pillow
 numpy
+pandas
+joblib
+scikit-learn
