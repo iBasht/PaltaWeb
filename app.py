@@ -34,7 +34,7 @@ def cargar_ia():
     # ----------------------------------------------------------------------
     if not os.path.exists(resnet_path):
         with st.spinner("Descargando arquitectura de clasificación desde el servidor..."):
-            url_modelo = "REEMPLAZA_ESTO_CON_EL_LINK_QUE_COPIASTE" 
+            url_modelo = "https://github.com/iBasht/PaltaWeb/releases/download/v1.0/modelo_resnet18_paltos.pth" 
             urllib.request.urlretrieve(url_modelo, resnet_path)
 
     # Cargar ResNet18
