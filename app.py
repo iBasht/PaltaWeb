@@ -113,7 +113,7 @@ with st.sidebar:
 # =====================================================================
 # 4. CUERPO PRINCIPAL DEL DASHBOARD: TABS Y PANELES
 # =====================================================================
-st.title("🥑 SAGIE Agro - Visión IA") # Nombre de producto/sistema
+st.title("🥑 PaltoWeb - Visión IA") # Nombre de producto/sistema
 pestana_monitoreo, pestana_historial, pestana_reportes = st.tabs([
     "📺 Monitoreo en Vivo", 
     "📜 Historial de Análisis", 
