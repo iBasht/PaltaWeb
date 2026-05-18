@@ -1,3 +1,5 @@
+import os
+import urllib.request
 import streamlit as st
 import torch
 import torch.nn as nn
@@ -17,16 +19,28 @@ device = torch.device("cpu") # En web usamos CPU
 class_names = ['Anthracnose', 'Healthy', 'Scab']
 colors = {'Healthy': (0, 255, 0), 'Anthracnose': (0, 0, 255), 'Scab': (0, 255, 255)}
 
-# --- CARGAR MODELOS (En Caché para que cargue rápido) ---
+# --- CARGAR MODELOS (Con descarga automática de la nube) ---
 @st.cache_resource
 def cargar_ia():
     # Cargar YOLO
     yolo = YOLO('yolo26n.pt') 
     
+    # Ruta local esperada
+    resnet_path = 'modelo_resnet18_paltos.pth'
+    
+    # ----------------------------------------------------------------------
+    # ¡AQUÍ ESTÁ LA LÍNEA NUEVA! 
+    # Reemplaza el texto adentro de las comillas con tu enlace de GitHub Releases
+    # ----------------------------------------------------------------------
+    if not os.path.exists(resnet_path):
+        with st.spinner("Descargando arquitectura de clasificación desde el servidor..."):
+            url_modelo = "REEMPLAZA_ESTO_CON_EL_LINK_QUE_COPIASTE" 
+            urllib.request.urlretrieve(url_modelo, resnet_path)
+
     # Cargar ResNet18
     resnet = models.resnet18(weights=None)
     resnet.fc = nn.Linear(resnet.fc.in_features, 3)
-    resnet.load_state_dict(torch.load('modelo_resnet18_paltos.pth', map_location=device))
+    resnet.load_state_dict(torch.load(resnet_path, map_location=device))
     resnet.eval()
     
     return yolo, resnet
@@ -89,4 +103,4 @@ if archivo_subido is not None:
                 st.image(img_final_rgb, caption="Resultado del Análisis", use_container_width=True)
                 
                 st.success(f"¡Análisis exitoso! {len(boxes)} paltas procesadas.")
-                st.json(conteo) # Muestra un pequeño resumen estructurado
+                st.json(conteo)
