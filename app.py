@@ -22,42 +22,89 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- NUEVO: FONDO TEMÁTICO CLARO (WHITES & GREENS) ---
+# --- NUEVO: ESTILO AVANZADO "JARDÍN BOTÁNICO" (TEMA CLARO CON ACENTOS VERDES) ---
 st.markdown("""
 <style>
-    /* Aplicar fondo blanco puro a todo el contenedor principal */
+    /* Fondo global blanco puro */
     .stApp {
         background-color: #FFFFFF;
     }
-    
-    /* Cambiar el color del texto global a gris oscuro para legibilidad */
-    [data-testid="stHeader"], [data-testid="stToolbar"], .stMarkdown, .stTable, [data-testid="stSidebar"] {
-        color: #333333;
+
+    /* Texto global gris oscuro para alta legibilidad */
+    [data-testid="stHeader"], [data-testid="stToolbar"], .stMarkdown, .stTable, [data-testid="stSidebar"], .stCaption {
+        color: #374151;
     }
 
-    /* Estilo para las métricas: un verde planta más natural */
-    [data-testid="stMetricValue"] { color: #1E6F3F; }
-    
-    /* Estilo para las tablas y contenedores: fondo blanco puro y bordes suaves */
-    div[data-testid="stTable"] { background-color: #FFFFFF; border: 1px solid #E0E0E0; border-radius: 10px; padding: 10px; }
-    div[data-testid="stHorizontalBlock"] { background-color: #FFFFFF; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
-    
-    /* Estilo para los botones principales: fondo verde claro con borde verde planta */
+    /* Estilo de los Paneles (Columnas) como Tarjetas con Borde Superior Verde */
+    div[data-testid="stHorizontalBlock"] > div > div > div > div {
+        background-color: #F0FDF4; /* Verde menta ultra-claro */
+        border-top: 4px solid #22C55E; /* Borde superior verde vibrante */
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 20px !important;
+        margin-bottom: 20px;
+    }
+
+    /* Títulos de los Paneles: Iconos y texto en verde esmeralda */
+    [data-testid="stHeader"] h2 {
+        color: #059669;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    [data-testid="stHeader"] h2::before {
+        content: "";
+        background-color: #D1FAE5; /* Fondo suave para el icono */
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: inline-block;
+    }
+
+    /* Estilo de las Métricas (ej: Fecha, Hora) */
+    [data-testid="stMetricValue"] {
+        color: #059669; /* Verde esmeralda */
+        font-size: 1.5rem;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #6B7280; /* Gris medio */
+    }
+
+    /* Estilo de las Tablas */
+    div[data-testid="stTable"] {
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        background-color: #FFFFFF;
+    }
+    .stTable td, .stTable th {
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    /* Estilo de los Botones Principales (ej: Iniciar Análisis, Generar Reporte) */
     .stButton>button {
-        background-color: #E8FDF3;
-        color: #1E6F3F;
-        border: 2px solid #1E6F3F;
-        border-radius: 5px;
+        background-color: #DCFCE7; /* Fondo verde menta suave */
+        color: #047857; /* Texto verde esmeralda oscuro */
+        border: 2px solid #10B981; /* Borde verde esmeralda vibrante */
+        border-radius: 8px;
+        font-weight: 600;
     }
     .stButton>button:hover {
-        background-color: #D1F7E1;
-        border: 2px solid #1A5932;
+        background-color: #D1FAE5; /* Fondo más oscuro al pasar el ratón */
+        border: 2px solid #059669;
     }
-    
-    /* Estilo para los archivos subidos y alertas */
-    div[data-testid="stFileUploader"] { background-color: #F8FDF9; border: 1px dashed #A3E0C1; border-radius: 10px; padding: 10px; }
-    .stAlert { background-color: #F8FDF9; color: #1E6F3F; border: 1px solid #A3E0C1; }
-    
+
+    /* Estilo de la Barra de Subida de Archivos */
+    div[data-testid="stFileUploader"] {
+        background-color: #F9FAFB;
+        border: 2px dashed #A7F3D0;
+        border-radius: 12px;
+    }
+
+    /* Estilo de las Barras de Progreso en la tabla derecha */
+    div[data-testid="stHorizontalBlock"] div[style*="width: 100%"] > div > div > div {
+        background-color: #10B981; /* Verde esmeralda para la barra */
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -146,7 +193,12 @@ with st.sidebar:
 # 4. CUERPO PRINCIPAL DEL DASHBOARD: TABS Y PANELES
 # =====================================================================
 # El tema claro integrará automáticamente la cabecera y pestañas.
-st.title("🥑 PaltoWeb - Visión IA")
+st.markdown("""
+    <div style="display: flex; align-items: center; gap: 15px; margin-top: -30px; margin-bottom: 20px;">
+        <span style="font-size: 3rem;">🥑</span>
+        <h1 style="color: #374151; margin: 0; padding: 0; font-size: 2.8rem;">PaltoWeb - Visión IA</h1>
+    </div>
+    """, unsafe_allow_html=True)
 pestana_monitoreo, pestana_historial, pestana_reportes = st.tabs([
     "📺 Monitoreo en Vivo", 
     "📜 Historial de Análisis", 
