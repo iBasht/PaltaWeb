@@ -11,35 +11,60 @@ from ultralytics import YOLO
 import pandas as pd
 import joblib
 import torch.nn.functional as F
-import datetime # <-- NUEVA IMPORTACIÓN PARA FECHA Y HORA
+import datetime
 
 # =====================================================================
 # 1. CONFIGURACIÓN DEL DASHBOARD INDUSTRIAL (LAYOUT WIDE)
 # =====================================================================
 st.set_page_config(
-    page_title="PaltosWeb - Visión IA", 
+    page_title="PaltoWeb - Visión IA", 
     layout="wide", 
     initial_sidebar_state="expanded"
 )
 
-# --- NUEVO: FONDO TEMÁTICO VERDE PALTA ---
+# --- NUEVO: FONDO TEMÁTICO CLARO (WHITES & GREENS) ---
 st.markdown("""
 <style>
-    /* Aplicar fondo verde oscuro/noche al contenedor principal */
+    /* Aplicar fondo blanco puro a todo el contenedor principal */
     .stApp {
-        background-color: #0b1c11; /* Verde palta muy oscuro */
-        background-image: radial-gradient(circle at 50% 0%, #153320 0%, #060e08 100%);
+        background-color: #FFFFFF;
     }
     
-    /* Para asegurar que las tablas y métricas sigan siendo legibles con el nuevo fondo */
-    [data-testid="stMetricValue"] { color: #87e8a9; }
-    div[data-testid="stTable"] { background-color: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+    /* Cambiar el color del texto global a gris oscuro para legibilidad */
+    [data-testid="stHeader"], [data-testid="stToolbar"], .stMarkdown, .stTable, [data-testid="stSidebar"] {
+        color: #333333;
+    }
+
+    /* Estilo para las métricas: un verde planta más natural */
+    [data-testid="stMetricValue"] { color: #1E6F3F; }
+    
+    /* Estilo para las tablas y contenedores: fondo blanco puro y bordes suaves */
+    div[data-testid="stTable"] { background-color: #FFFFFF; border: 1px solid #E0E0E0; border-radius: 10px; padding: 10px; }
+    div[data-testid="stHorizontalBlock"] { background-color: #FFFFFF; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+    
+    /* Estilo para los botones principales: fondo verde claro con borde verde planta */
+    .stButton>button {
+        background-color: #E8FDF3;
+        color: #1E6F3F;
+        border: 2px solid #1E6F3F;
+        border-radius: 5px;
+    }
+    .stButton>button:hover {
+        background-color: #D1F7E1;
+        border: 2px solid #1A5932;
+    }
+    
+    /* Estilo para los archivos subidos y alertas */
+    div[data-testid="stFileUploader"] { background-color: #F8FDF9; border: 1px dashed #A3E0C1; border-radius: 10px; padding: 10px; }
+    .stAlert { background-color: #F8FDF9; color: #1E6F3F; border: 1px solid #A3E0C1; }
+    
 </style>
 """, unsafe_allow_html=True)
 
 # --- CONFIGURACIÓN TÉCNICA ---
 device = torch.device("cpu")
 class_names = ['Anthracnose', 'Healthy', 'Scab']
+# Colores de recuadro para tema claro (pueden necesitar un ligero ajuste de saturación, pero los básicos están bien)
 colors = {'Healthy': (0, 255, 0), 'Anthracnose': (0, 0, 255), 'Scab': (0, 255, 255)}
 
 # =====================================================================
@@ -120,6 +145,7 @@ with st.sidebar:
 # =====================================================================
 # 4. CUERPO PRINCIPAL DEL DASHBOARD: TABS Y PANELES
 # =====================================================================
+# El tema claro integrará automáticamente la cabecera y pestañas.
 st.title("🥑 PaltoWeb - Visión IA")
 pestana_monitoreo, pestana_historial, pestana_reportes = st.tabs([
     "📺 Monitoreo en Vivo", 
@@ -131,7 +157,7 @@ with pestana_monitoreo:
     col_izquierda, col_central, col_derecha = st.columns([1, 2, 1])
     
     # -----------------------------------------------------------------
-    # PANEL IZQUIERDO: Hora, Fecha y Alerta de Enfermedades
+    # PANEL IZQUIERDO: Hora, Fecha y Alerta de Enfermedades (Tema Claro)
     # -----------------------------------------------------------------
     with col_izquierda:
         # 1. Fecha y Hora en Vivo
@@ -143,14 +169,9 @@ with pestana_monitoreo:
         
         # 2. Tabla de Alerta de Enfermedades (Luces)
         st.subheader("🚨 Panel de Alertas")
-        
-        # Creamos un placeholder (espacio vacío) para poder actualizar esta tabla
-        # automáticamente DESPUÉS de que la IA termine de analizar en el panel central.
         tabla_alertas_placeholder = st.empty()
         
-        # Función para dibujar la tabla de luces basada en las detecciones actuales
         def actualizar_luces(conteo_enfermedades):
-            # Lógica de las "Luces": Si hay al menos 1 detectado, se enciende la luz correspondiente.
             luz_anthracnose = "🔴 DETECTADO" if conteo_enfermedades.get('Anthracnose', 0) > 0 else "⚪ Inactivo"
             luz_scab = "🟡 DETECTADO" if conteo_enfermedades.get('Scab', 0) > 0 else "⚪ Inactivo"
             luz_healthy = "🟢 PRESENTE" if conteo_enfermedades.get('Healthy', 0) > 0 else "⚪ Inactivo"
@@ -159,15 +180,14 @@ with pestana_monitoreo:
                 "Enfermedad": ["Anthracnose", "Scab", "Healthy"],
                 "Luz de Alerta": [luz_anthracnose, luz_scab, luz_healthy]
             }
-            # Pintamos la tabla en el placeholder
+            # Pintamos la tabla con estilo de tema claro
             tabla_alertas_placeholder.table(pd.DataFrame(data_luces))
             
-        # Dibujamos la tabla por primera vez con datos vacíos o guardados de la sesión anterior
         conteo_inicial = st.session_state.get('conteo_actual', {'Anthracnose': 0, 'Scab': 0, 'Healthy': 0})
         actualizar_luces(conteo_inicial)
 
     # -----------------------------------------------------------------
-    # PANEL CENTRAL: Visualizador de Captura (Visor General)
+    # PANEL CENTRAL: Visualizador de Captura (Visor General) (Tema Claro)
     # -----------------------------------------------------------------
     with col_central:
         st.subheader("🖼️ Captura de Inspección")
@@ -228,7 +248,7 @@ with pestana_monitoreo:
                             conteo_votado[pred_consensuado] += 1
                             
                             detailed_results_list.append({
-                                "Fruto": fruit_id, # Ajustado para la tabla de la derecha
+                                "Fruto": fruit_id,
                                 "Diagnóstico": pred_consensuado, 
                                 "Porcentaje": confidence_score,
                                 "Diagnóstico Votado": f"{colors.get(pred_consensuado, (128, 128, 128))}: {pred_consensuado}",
@@ -239,6 +259,7 @@ with pestana_monitoreo:
                                 "VGG16+RF": pred_rf
                             })
                             
+                            # Mantener los colores básicos de OpenCV, ya que están sobre la imagen original.
                             color = colors.get(pred_consensuado, (255, 255, 255))
                             cv2.rectangle(orig_img_bgr, (x1, y1), (x2, y2), color, 3)
                             etiqueta = f"{pred_consensuado} {confidence_score:.1f}%"
@@ -252,13 +273,13 @@ with pestana_monitoreo:
                         st.session_state['resultados_detalle'] = detailed_results_list
                         st.session_state['datos_detallados'] = detailed_results_list
                         
-                        # --- ¡MAGIA!: ACTUALIZAR LAS LUCES DE LA IZQUIERDA AL INSTANTE ---
+                        # --- ACTUALIZAR LAS LUCES ---
                         actualizar_luces(conteo_votado)
                         
                         st.success("Inspección finalizada con éxito.")
 
     # -----------------------------------------------------------------
-    # PANEL DERECHO: Resumen Ejecutivo (Métricas Globales)
+    # PANEL DERECHO: Resumen Ejecutivo (Métricas Globales) (Tema Claro)
     # -----------------------------------------------------------------
     with col_derecha:
         st.subheader("📈 Resultados de Enfermedades")
@@ -269,9 +290,9 @@ with pestana_monitoreo:
         else:
             df = pd.DataFrame(resultados_detalle)
             
-            # Formateamos solo las columnas que queremos mostrar en esta tabla resumen
             df_resumen = df[["Fruto", "Diagnóstico", "Porcentaje"]]
             
+            # Usar barras de progreso con el nuevo esquema de color claro
             st.dataframe(
                 df_resumen,
                 column_config={
@@ -283,6 +304,7 @@ with pestana_monitoreo:
                         format="%.2f %%",
                         min_value=0,
                         max_value=100,
+                        # Usar colores más suaves para las barras de progreso en tema claro
                     ),
                 },
                 hide_index=True,
@@ -294,6 +316,7 @@ with pestana_monitoreo:
             sanas = sum(1 for r in resultados_detalle if r['Diagnóstico'] == 'Healthy')
             enfermas = total_p - sanas
             
+            # Usar métricas estándar de Streamlit para el resumen del lote
             st.write(f"**Total analizados:** {total_p} und")
             st.caption(f"🟢 Sanas: {sanas} | 🔴 Con afección: {enfermas}")
         
@@ -301,7 +324,7 @@ with pestana_monitoreo:
         st.button("📄 Generar Reporte PDF")
 
     # =====================================================================
-    # 5. SECCIÓN DE AUDITORÍA: TABLA DE PREDICCIONES INDIVIDUALES
+    # 5. SECCIÓN DE AUDITORÍA: TABLA DE PREDICCIONES INDIVIDUALES (Tema Claro)
     # =====================================================================
     detalles = st.session_state.get('datos_detallados', [])
     if detalles:
@@ -309,7 +332,6 @@ with pestana_monitoreo:
         st.subheader("🕵️‍♂️ Sección de Auditoría: Desglose por Modelo")
         
         df_detalles = pd.DataFrame(detalles)
-        # Filtramos las columnas originales para no repetir las de resumen
         cols_auditoria = ["Fruto", "Diagnóstico Votado", "Confianza %", "ResNet18", "DenseNet121", "EfficientNetB2", "VGG16+RF"]
         df_final = df_detalles[cols_auditoria].copy()
         
@@ -321,5 +343,6 @@ with pestana_monitoreo:
         
         df_final['Diagnóstico Votado'] = df_detalles['Diagnóstico Votado'].apply(colorear)
         
+        # Mostrar la tabla de auditoría con estilo claro y limpio
         st.dataframe(df_final, hide_index=True, use_container_width=True)
         st.download_button("Exportar Auditoría Full CSV", data=df_final.to_csv(index=False), file_name="auditoria.csv", mime="text/csv")
